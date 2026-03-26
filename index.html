@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#800000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Nehal & Sajiya Wedding Invitation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Reem+Kufi+Ink&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --ivory: #FFFFF0;
+            --cream: #FFFDD0;
+            --maroon: #800000;
+            --gold: #D4AF37;
+            --black: #1a1a1a;
+            --font-cursive: 'Great Vibes', cursive;
+            --font-arabic: 'Reem Kufi Ink', sans-serif;
+            --font-serif: 'Playfair Display', serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--ivory);
+            color: var(--black);
+            font-family: var(--font-serif);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* --- Curtain --- */
+        #curtain-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--ivory);
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .curtain-side {
+            position: absolute;
+            top: 0;
+            width: 50%;
+            height: 100%;
+            background-color: var(--maroon);
+            background-image: radial-gradient(circle at 50% 50%, rgba(0,0,0,0.1) 0%, transparent 80%),
+                              url('https://www.transparenttextures.com/patterns/vertical-cloth.png');
+            transition: transform 1.2s ease-in-out;
+            z-index: 1;
+        }
+
+        .curtain-left {
+            left: 0;
+            border-right: 4px solid rgba(212, 175, 55, 0.4);
+        }
+
+        .curtain-right {
+            right: 0;
+            border-left: 4px solid rgba(212, 175, 55, 0.4);
+        }
+
+        #curtain-overlay.open .curtain-left { transform: translateX(-100%); }
+        #curtain-overlay.open .curtain-right { transform: translateX(100%); }
+        #curtain-overlay.open { opacity: 0; pointer-events: none; }
+
+        .invitation-card {
+            position: relative;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2.5rem;
+            border-radius: 2rem;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+            border: 2px solid rgba(212, 175, 55, 0.2);
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 380px) {
+            .invitation-card {
+                padding: 1.5rem;
+            }
+            .invitation-card h1 {
+                font-size: 2.5rem !important;
+            }
+        }
+
+        .heart-icon {
+            width: 5rem;
+            height: 5rem;
+            background: rgba(128, 0, 0, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .btn-open {
+            width: 100%;
+            padding: 1rem;
+            background: var(--maroon);
+            color: var(--ivory);
+            border: none;
+            border-radius: 2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(128, 0, 0, 0.2);
+        }
+
+        .btn-open:hover {
+            background: #600000;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(128, 0, 0, 0.3);
+        }
+
+        /* --- Main Content --- */
+        main {
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        main.visible { opacity: 1; }
+
+        section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 1.5rem;
+            text-align: center;
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            section {
+                padding: 3rem 1rem;
+            }
+        }
+
+        .hero { background: linear-gradient(to bottom, var(--cream), var(--ivory)); }
+        .scratch-section { background: white; }
+        .countdown-section { background: rgba(255, 253, 208, 0.3); }
+
+        .cursive { 
+            font-family: var(--font-cursive); 
+            color: var(--maroon); 
+            font-size: clamp(2.5rem, 10vw, 4rem);
+        }
+        .arabic { 
+            font-family: var(--font-arabic); 
+            color: var(--maroon); 
+            font-size: clamp(1.5rem, 8vw, 2.5rem); 
+            margin: 1rem 0; 
+        }
+        .maroon { color: var(--maroon); }
+        .gold { color: var(--gold); }
+
+        /* --- Scratch Card --- */
+        .scratch-container {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            height: 180px;
+            margin: 2rem auto;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 4px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .scratch-content {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+
+        #scratch-canvas {
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        /* --- Countdown --- */
+        .countdown-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .countdown-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .countdown-box {
+            background: white;
+            padding: 1.5rem 1rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            border: 1px solid rgba(128, 0, 0, 0.05);
+        }
+
+        @media (max-width: 380px) {
+            .countdown-value { font-size: 1.8rem; }
+            .countdown-box { padding: 1rem 0.5rem; }
+        }
+
+        .countdown-value { font-size: clamp(1.8rem, 6vw, 2.5rem); color: var(--maroon); font-weight: bold; }
+        .countdown-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em; color: #999; }
+
+        /* --- Floating Elements --- */
+        .floating-emoji {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.2; }
+            90% { opacity: 0.2; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- Music Button --- */
+        #music-toggle {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            z-index: 50;
+            width: 3.5rem;
+            height: 3.5rem;
+            background: var(--maroon);
+            color: var(--ivory);
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+
+        #music-toggle:hover { transform: scale(1.1); }
+
+        @media (max-width: 380px) {
+            #music-toggle {
+                width: 3rem;
+                height: 3rem;
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+        
+        /* --- Reveal Animation --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Details --- */
+        .detail-card {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            background: rgba(128, 0, 0, 0.05);
+            border-radius: 1.5rem;
+            margin-bottom: 1rem;
+            text-align: left;
+            border: 1px solid rgba(128, 0, 0, 0.1);
+        }
+
+        .detail-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            background: white;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .btn-action {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 1rem;
+            border-radius: 1rem;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 1rem;
+            transition: all 0.3s;
+        }
+
+        .btn-maroon { background: var(--maroon); color: var(--ivory); }
+        .btn-white { background: white; color: var(--maroon); border: 1px solid rgba(128, 0, 0, 0.2); }
+
+        .btn-action:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        /* --- Responsive Typography --- */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3rem !important; }
+            .hero h2.arabic { font-size: 2rem !important; }
+            .cursive { font-size: 2.5rem !important; }
+            .scratch-section h2 { font-size: 2rem !important; }
+            .countdown-section h2 { font-size: 3rem !important; }
+            .detail-card { padding: 1rem; gap: 1rem; }
+            .detail-icon { width: 3rem; height: 3rem; }
+            .detail-card p { font-size: 0.9rem !important; }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 { font-size: 2.5rem !important; }
+            .hero p { font-size: 0.8rem !important; }
+            .detail-card p { font-size: 0.8rem !important; }
+        }
+
+        footer {
+            padding: 4rem 2rem;
+            text-align: center;
+            background: white;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Audio -->
+    <audio id="bg-music" loop preload="auto">
+        <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_783d1a0102.mp3" type="audio/mpeg">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="yay-sound" preload="auto">
+        <source src="https://cdn.pixabay.com/audio/2021/08/04/audio_0625c1539c.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Curtain Overlay -->
+    <div id="curtain-overlay">
+        <div class="curtain-side curtain-left"></div>
+        <div class="curtain-side curtain-right"></div>
+        
+        <div class="invitation-card">
+            <div class="heart-icon">
+                <i data-lucide="heart" color="#800000" fill="#800000"></i>
+            </div>
+            <p style="font-size: 0.6rem; letter-spacing: 0.4em; color: #999; text-transform: uppercase; margin-bottom: 0.5rem;">The Royal Wedding</p>
+            <h1 class="cursive" style="margin-bottom: 1.5rem;">Invitation</h1>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 2rem;">
+                <div style="width: 2rem; height: 1px; background: rgba(212, 175, 55, 0.3);"></div>
+                <p style="font-style: italic; font-size: 0.9rem; color: #666;">Nehal & Sajiya</p>
+                <div style="width: 2rem; height: 1px; background: rgba(212, 175, 55, 0.3);"></div>
+            </div>
+            <button class="btn-open" onclick="openInvitation()">Tap to Open</button>
+        </div>
+    </div>
+
+    <!-- Music Toggle -->
+    <button id="music-toggle" onclick="toggleMusic()" style="display: none;">
+        <i id="music-icon" data-lucide="volume-2"></i>
+    </button>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Hero -->
+        <section class="hero reveal">
+            <div style="max-width: 600px;">
+                <i data-lucide="heart" color="#800000" fill="#800000" size="24" style="margin-bottom: 1rem;"></i>
+                <p style="font-size: 0.7rem; letter-spacing: 0.3em; font-weight: bold; text-transform: uppercase; color: var(--maroon);">We're Getting Married</p>
+                <h2 class="arabic">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</h2>
+                <p style="font-size: 0.7rem; color: #999; font-style: italic; margin-bottom: 2rem;">In The Name Of Allah The Most Beneficent And The Most Merciful</p>
+                
+                <div style="padding: 1rem; border-top: 1px solid rgba(212, 175, 55, 0.2); border-bottom: 1px solid rgba(212, 175, 55, 0.2); margin-bottom: 2rem;">
+                    <div style="margin-bottom: 1.5rem;">
+                        <p style="font-size: 0.6rem; color: #999; text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 0.5rem;">With Blessings of</p>
+                        <p style="font-size: 1.1rem; color: var(--maroon); font-weight: bold; letter-spacing: 0.05em;">Late. Haji Wasim Ahmed Shaikh.</p>
+                    </div>
+                    <p style="color: var(--maroon); font-size: 0.9rem;">I Request the honour of your presence & blessings to celebrate Reception Ceremony of</p>
+                </div>
+
+                <h1 class="cursive">Mohammed Nehal Shaikh</h1>
+                <p style="font-size: 0.7rem; color: #666; font-style: italic;">S/o Mr. Nazare Alam Shaikh & Mrs. Tarannum Begum</p>
+                
+                <p class="cursive" style="margin: 1rem 0;">&</p>
+
+                <h1 class="cursive">Sajiya Banu Shaikh</h1>
+                <p style="font-size: 0.7rem; color: #666; font-style: italic;">D/o Mr. Fakir Mohammed & Mrs. Shaher Banu</p>
+
+                <div style="margin-top: 3rem;">
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 2rem;">Join us in celebrating our love</p>
+                    
+                    <div style="margin-bottom: 3rem;">
+                        <p style="font-size: 0.7rem; color: var(--maroon); text-transform: uppercase; letter-spacing: 0.2em; margin-bottom: 0.5rem;">With Best Compliments from:</p>
+                        <p style="font-size: 1.1rem; color: var(--black); font-weight: 500; margin-bottom: 1.5rem;">Aisha • Ishaq • Sahil • All Relatives & Friends</p>
+                        
+                        <p style="font-size: 1rem; color: #555; line-height: 1.8;">Nazare Alam • Noor Alam • Shah Alam • Mohammed Akbar • Hafiz Mohammed Akhtar</p>
+                    </div>
+
+                    <div style="color: #ccc; display: flex; flex-direction: column; align-items: center;">
+                        <p style="font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.5rem;">Scroll Down</p>
+                        <i data-lucide="chevron-down" class="animate-bounce"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scratch Reveal -->
+        <section class="scratch-section reveal">
+            <p style="font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--maroon); margin-bottom: 1rem;">Save The Date</p>
+            <h2 style="font-size: 2.5rem; color: var(--maroon); margin-bottom: 1rem;">Reveal</h2>
+            <p style="font-size: 0.9rem; color: #999; margin-bottom: 2rem;">Scratch to discover the date!</p>
+
+            <div class="scratch-container">
+                <div class="scratch-content">
+                    <p style="font-size: 1.5rem; font-weight: bold; color: var(--maroon); letter-spacing: 0.1em;">APRIL 26, 2026</p>
+                    <p style="font-size: 0.6rem; color: #999; text-transform: uppercase; letter-spacing: 0.2em; margin-top: 0.5rem;">Save the Date</p>
+                </div>
+                <canvas id="scratch-canvas"></canvas>
+            </div>
+        </section>
+
+        <!-- Countdown -->
+        <section class="countdown-section reveal">
+            <p style="font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--maroon); margin-bottom: 1.5rem;">Counting Down To</p>
+            <h2 class="cursive" style="margin-bottom: 2rem;">Dawat-E-Walima</h2>
+            
+            <div class="countdown-grid">
+                <div class="countdown-box reveal">
+                    <div id="days" class="countdown-value">00</div>
+                    <div class="countdown-label">Days</div>
+                </div>
+                <div class="countdown-box reveal">
+                    <div id="hours" class="countdown-value">00</div>
+                    <div class="countdown-label">Hours</div>
+                </div>
+                <div class="countdown-box reveal">
+                    <div id="minutes" class="countdown-value">00</div>
+                    <div class="countdown-label">Minutes</div>
+                </div>
+                <div class="countdown-box reveal">
+                    <div id="seconds" class="countdown-value">00</div>
+                    <div class="countdown-label">Seconds</div>
+                </div>
+            </div>
+
+            <p style="margin-top: 3rem; font-style: italic; color: var(--maroon); font-size: 1.2rem;">We can't wait to celebrate with you!</p>
+        </section>
+
+        <!-- Details -->
+        <section style="background: white;" class="reveal">
+            <div style="max-width: 500px; width: 100%;">
+                <p style="font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: #999; margin-bottom: 1rem;">Event Details</p>
+                <h2 class="cursive" style="margin-bottom: 2rem;">When & Where</h2>
+
+                <div class="detail-card reveal">
+                    <div class="detail-icon"><i data-lucide="calendar" color="#800000"></i></div>
+                    <div>
+                        <p style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em; color: #999; font-weight: bold;">Event</p>
+                        <p style="font-size: 1.1rem; color: var(--maroon); font-weight: 500;">Walima Ceremony</p>
+                    </div>
+                </div>
+
+                <div class="detail-card reveal">
+                    <div class="detail-icon"><i data-lucide="clock" color="#800000"></i></div>
+                    <div>
+                        <p style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em; color: #999; font-weight: bold;">Time</p>
+                        <p style="font-size: 1.1rem; color: var(--maroon); font-weight: 500;">8:00 PM Onwards</p>
+                        <p style="font-size: 0.75rem; color: #666;">Sunday, April 26th, 2026</p>
+                    </div>
+                </div>
+
+                <div class="detail-card reveal">
+                    <div class="detail-icon"><i data-lucide="map-pin" color="#800000"></i></div>
+                    <div>
+                        <p style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em; color: #999; font-weight: bold;">Venue</p>
+                        <p style="font-size: 1.1rem; color: var(--maroon); font-weight: 500;">Agri Koli Sanskruti Bhavan</p>
+                        <p style="font-size: 0.75rem; color: #666;">Plot No. 12, Off Palm Beach Road, Sec 24, Nerul, Navi Mumbai</p>
+                    </div>
+                </div>
+
+                <div style="padding: 2.5rem; background: rgba(128, 0, 0, 0.05); border-radius: 2rem; margin-top: 3rem; border: 1px solid rgba(128, 0, 0, 0.1);">
+                    <p style="font-style: italic; color: var(--maroon); font-size: 1.1rem; line-height: 1.8;">“There is nothing like marriage, for two who love one another”</p>
+                    <p style="font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em; color: #ccc; margin-top: 1rem;">— Prophet Mohammed S.A.W</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Location -->
+        <section style="background: rgba(255, 253, 208, 0.1);" class="reveal">
+            <div style="max-width: 500px; width: 100%;">
+                <p style="font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: #999; margin-bottom: 1rem;">Find Us Here</p>
+                <h2 class="cursive" style="margin-bottom: 2rem;">Venue Location</h2>
+
+                <div style="aspect-ratio: 16/9; width: 100%; background: rgba(128, 0, 0, 0.05); border-radius: 2rem; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(128, 0, 0, 0.1);">
+                    <div style="position: absolute; inset: 0; opacity: 0.2; background-image: url('https://www.transparenttextures.com/patterns/cubes.png');"></div>
+                    <div style="position: relative; z-index: 1; text-align: center;">
+                        <div style="width: 3.5rem; height: 3.5rem; background: rgba(128, 0, 0, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i data-lucide="map-pin" color="#800000" size="24"></i>
+                        </div>
+                        <h3 style="font-size: 1rem; color: var(--maroon); font-weight: bold; margin-bottom: 0.25rem;">Agri Koli Sanskruti Bhavan</h3>
+                        <p style="font-size: 0.8rem; color: #999;">Nerul, Navi Mumbai</p>
+                    </div>
+                </div>
+
+                <a href="https://maps.app.goo.gl/oqRcSXC5xMDJz91V7" target="_blank" class="btn-action btn-maroon">
+                    <i data-lucide="map-pin" size="18"></i> Get Directions
+                </a>
+                <a href="https://wa.me/918850286396?text=I%20will%20Attend%20Dawat-E-Walima%20on%2026th%20April%202026%2C%20In%20sha%20Allah." target="_blank" class="btn-action btn-white">
+                    <i data-lucide="calendar" size="18"></i> RSVP via WhatsApp
+                </a>
+                <p style="font-size: 0.6rem; color: #ccc; margin-top: 1rem;">Parking: Free parking available on-site</p>
+            </div>
+        </section>
+
+        <footer>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; margin-bottom: 2rem;">
+                <div style="width: 3rem; height: 1px; background: rgba(128, 0, 0, 0.2);"></div>
+                <i data-lucide="heart" color="#800000" fill="#800000" size="16"></i>
+                <div style="width: 3rem; height: 1px; background: rgba(128, 0, 0, 0.2);"></div>
+            </div>
+            <h2 class="cursive" style="margin-bottom: 1.5rem;">We can't wait to see you!</h2>
+            <p style="max-width: 300px; margin: 0 auto; font-size: 0.9rem; color: #999; line-height: 1.8;">Your presence is the greatest gift we could ask for. Join us as we begin our journey together.</p>
+        </footer>
+    </main>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Set initial volumes
+        const music = document.getElementById('bg-music');
+        const yay = document.getElementById('yay-sound');
+        music.volume = 0.5;
+        yay.volume = 0.5;
+
+        // Global state
+        let isMuted = false;
+        let playPromise = null;
+
+        // --- Invitation Logic ---
+        function openInvitation() {
+            const curtain = document.getElementById('curtain-overlay');
+            const main = document.getElementById('main-content');
+            const musicBtn = document.getElementById('music-toggle');
+
+            curtain.classList.add('open');
+            main.classList.add('visible');
+            musicBtn.style.display = 'flex';
+            
+            // Set volume and play
+            music.volume = 0.5;
+            music.muted = false;
+            music.load();
+            playPromise = music.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.catch(e => {
+                    console.log("Autoplay blocked, waiting for next interaction:", e);
+                    // Fallback: play on first scroll or click
+                    const playOnInteraction = () => {
+                        music.play();
+                        window.removeEventListener('click', playOnInteraction);
+                        window.removeEventListener('scroll', playOnInteraction);
+                    };
+                    window.addEventListener('click', playOnInteraction);
+                    window.addEventListener('scroll', playOnInteraction);
+                });
+            }
+            
+            // Start floating emojis
+            startFloatingEmojis();
+        }
+
+        // --- Music Toggle ---
+        function toggleMusic() {
+            const icon = document.getElementById('music-icon');
+            
+            if (isMuted) {
+                playPromise = music.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(e => console.log("Playback failed:", e));
+                }
+                icon.setAttribute('data-lucide', 'volume-2');
+            } else {
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        music.pause();
+                    }).catch(e => {
+                        // If play failed, we can still try to pause just in case
+                        music.pause();
+                        console.log("Pause after failed play:", e);
+                    });
+                } else {
+                    music.pause();
+                }
+                icon.setAttribute('data-lucide', 'volume-x');
+            }
+            isMuted = !isMuted;
+            lucide.createIcons();
+        }
+
+        // --- Countdown ---
+        const weddingDate = new Date('2026-04-26T19:00:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = weddingDate - now;
+
+            if (distance < 0) return;
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = days.toString().padStart(2, '0');
+            document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').innerText = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').innerText = seconds.toString().padStart(2, '0');
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // --- Floating Emojis ---
+        function startFloatingEmojis() {
+            const emojis = ['❤️', '💍', '✨', '🌸', '🕊️', '💖', '🥂'];
+            setInterval(() => {
+                const emoji = document.createElement('div');
+                emoji.className = 'floating-emoji';
+                emoji.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.style.left = Math.random() * 100 + 'vw';
+                emoji.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                emoji.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                document.body.appendChild(emoji);
+
+                setTimeout(() => emoji.remove(), 20000);
+            }, 1000);
+        }
+
+        // --- Reveal on Scroll ---
+        function reveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            reveals.forEach(el => observer.observe(el));
+        }
+        reveal();
+
+        // --- Scratch Card ---
+        const canvas = document.getElementById('scratch-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        let isScratched = false;
+
+        function initScratch() {
+            const container = canvas.parentElement;
+            const width = container.offsetWidth;
+            const height = container.offsetHeight;
+            canvas.width = width;
+            canvas.height = height;
+
+            const gradient = ctx.createLinearGradient(0, 0, width, height);
+            gradient.addColorStop(0, '#D4AF37');
+            gradient.addColorStop(0.5, '#F9E29C');
+            gradient.addColorStop(1, '#B8860B');
+            
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.fillStyle = '#800000';
+            ctx.font = 'bold 16px serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('SCRATCH HERE', width / 2, height / 2);
+        }
+
+        let isDrawing = false;
+        function scratch(e) {
+            if (!isDrawing || isScratched) return;
+            
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const x = clientX - rect.left;
+            const y = clientY - rect.top;
+
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 25, 0, Math.PI * 2);
+            ctx.fill();
+
+            checkScratch();
+        }
+
+        function checkScratch() {
+            const width = canvas.width;
+            const height = canvas.height;
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const pixels = imageData.data;
+            let count = 0;
+            for (let i = 0; i < pixels.length; i += 4) {
+                if (pixels[i + 3] === 0) count++;
+            }
+
+            if (count > (width * height * 0.45) && !isScratched) {
+                isScratched = true;
+                ctx.clearRect(0, 0, width, height);
+                
+                // Play yay sound
+                yay.play().catch(e => console.log("Yay sound blocked:", e));
+
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#800000', '#D4AF37', '#FFFFF0']
+                });
+            }
+        }
+
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        canvas.addEventListener('mousemove', scratch);
+        window.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); });
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); scratch(e); });
+        canvas.addEventListener('touchend', () => isDrawing = false);
+
+        window.addEventListener('resize', () => {
+            if (!isScratched) initScratch();
+        });
+
+        initScratch();
+    </script>
+</body>
+</html>
